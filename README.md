@@ -1,6 +1,6 @@
 # Srap
 
-the Shell Rc APpender
+the *s*hell *r*c *ap*pender
 
 ## Usage
 ```
