@@ -20,6 +20,8 @@ A nice little program to append a given line to the current shell's config file,
 
 Tested with bash and zsh, should work on nsh, ksh, tcsh, ion, and fish shells as well as far as i know.
 
+Includes a helper for the alias command, so you don't have to escape quotations, but that is good practise!
+
 ## License
 This program and all source code is licensed under the GNU GPLv3
 
