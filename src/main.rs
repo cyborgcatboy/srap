@@ -106,10 +106,12 @@ fn main() {
     if args.len() == 0 || args.contains(&"-h".to_owned()) || args.contains(&"--help".to_owned()) {
         print_help();
         return;
-    }  
+    } 
 
     let config = parse_args(&args); // get the config
     
+    if config.verbose { println!("{:?}", &args); }
+
     // notify the user if we are doing a dry run
     if config.dryrun { println!("{}", { if config.nocolor { "Doing a dry run..." } else { "\x1b[31;1mDoing a dry run...\x1b[0m" }}) };
 
@@ -120,11 +122,18 @@ fn main() {
     };
 
     // get the line to append from the index and the length
-    let line_to_append: String = if args.len() > 0 { 
+    let mut line_to_append: String = if args.len() > 0 { 
         format!("\n{}", &args[line..args.len()].join(" "))
     } else {
         println!("Please enter a line!"); /* getting here shouldn't be possible */"".to_owned()
     };
+
+    // just a helper thing to add in the correct "" if alias is in the line
+    if line_to_append.contains("alias") && !line_to_append.contains("\"") {
+        let alias_start = match line_to_append.find("=") { Some(val) => val, _ => 1992 } + 1;
+        line_to_append.insert(alias_start, '\"');
+        line_to_append.insert(line_to_append.len(), '\"');
+    }
 
     if config.verbose { println!("appending line: `{}`", line_to_append); }
 
