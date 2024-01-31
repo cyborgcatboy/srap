@@ -1,6 +1,6 @@
 # Srap
 
-the *s*hell *r*c *ap*pender
+the **s**hell **r**c **ap**pender
 
 ## Usage
 ```
