@@ -60,7 +60,8 @@ fn parse_args(args: &mut Vec<String>) -> SrapConfig {
 
         let filename = args[file_arg_index].clone();
 
-        args.remove(file_arg_index);
+        args.remove(file_arg_index); //gotta remove the file argument, otherwise itll end up
+                                     //messing up the line
         config.file = filename;
         
         if config.verbose { println!("index: {file_arg_index}; filename: {}, args {:?}", &config.file, &args); }
