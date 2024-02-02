@@ -23,6 +23,7 @@ use std::{ env, fs, path::Path };
 struct SrapConfig {
     all: bool,
     dryrun: bool,
+    file: String,
     nocolor: bool,
     verbose: bool
 }
@@ -30,12 +31,12 @@ struct SrapConfig {
 impl SrapConfig {
     // init the config with some optional default values
     fn new_default() -> SrapConfig {
-        SrapConfig { all: false, dryrun: false, nocolor: false, verbose: false }
+        SrapConfig { all: false, dryrun: false, file: String::new(), nocolor: false, verbose: false }
     }
 }
 
 // parse the command-line arguments from a String vector and return the config struct
-fn parse_args(args: &Vec<String>) -> SrapConfig {
+fn parse_args(args: &mut Vec<String>) -> SrapConfig {
     let mut config = SrapConfig::new_default();
 
     if args.contains(&"-a".to_owned()) || args.contains(&"--all".to_owned()) {
@@ -45,13 +46,28 @@ fn parse_args(args: &Vec<String>) -> SrapConfig {
     if args.contains(&"-d".to_owned()) || args.contains(&"--dry-run".to_owned()) {
         config.dryrun = true;
     }
+    
+    if args.contains(&"-v".to_owned()) || args.contains(&"--verbose".to_owned()) {
+        config.verbose = true;
+    }
+    
+    if args.contains(&"-f".to_owned()) || args.contains(&"--file".to_owned()) {
+        // find the nect argument, this is the filename.
+        let file_arg_index = match args.iter().position( |a| a.contains("-f") ) {
+            None => { panic!("You must provide a filename!"); },
+            Some(index) => index
+        } + 1;
+
+        let filename = args[file_arg_index].clone();
+
+        args.remove(file_arg_index);
+        config.file = filename;
+        
+        if config.verbose { println!("index: {file_arg_index}; filename: {}, args {:?}", &config.file, &args); }
+    }
 
     if args.contains(&"-n".to_owned()) || args.contains(&"--no-color".to_owned()) {
         config.nocolor = true;
-    }
-
-    if args.contains(&"-v".to_owned()) || args.contains(&"--verbose".to_owned()) {
-        config.verbose = true;
     }
 
     config
@@ -84,11 +100,12 @@ fn print_help() {
 
 Usage: srap [options] <line to append>
 Options:
--a / --all      : append line to all POSIX-compliant shells
--d / --dry-run  : do a dry run of the program
--h / --help     : show this help
--n / --no-color : no colored output
--v / --verbose  : verbose output
+-a / --all             : append line to all POSIX-compliant shells
+-d / --dry-run         : do a dry run of the program
+-f / --file <filename> : specify a file
+-h / --help            : show this help
+-n / --no-color        : no colored output
+-v / --verbose         : verbose output
 
 Supports bash, ksh, nsh, zsh as POSIX-compliant, and fish, tcsh, and ion shells 
 (stable for both bash and zsh, everything else experimental)
@@ -108,7 +125,7 @@ fn main() {
         return;
     } 
 
-    let config = parse_args(&args); // get the config
+    let config = parse_args(&mut args); // get the config
     
     if config.verbose { println!("{:?}", &args); }
 
@@ -139,11 +156,13 @@ fn main() {
 
     if config.all {
         // do all the posix compliant shells
-        let config_files: Vec<String> = vec!["~/.bashrc".to_string(), 
+        let mut config_files: Vec<String> = vec!["~/.bashrc".to_string(), 
                                              "~/.zshrc".to_string(),
                                              "~/.nshrc".to_string(),
                                              "~/.kshrc".to_string()];
         
+        if !config.file.is_empty() { config_files.push(config.file) }
+
         // get the home directory
         let home_dir = match env::var("HOME") {
             Ok(val) => val,
@@ -202,8 +221,10 @@ fn main() {
         if config.verbose { println!("SHELL: {shell}"); }
 
         // find the config file we're using
-        let config_file_path = { 
-            if shell.as_str() == find_it("zsh".to_string()) {
+        let config_file_path = {
+            if !config.file.is_empty() {
+                config.file.as_str()
+            } else if shell.as_str() == find_it("zsh".to_string()) {
                 "~/.zshrc"
             } else if shell.as_str() == find_it("bash".to_string()) {
                 "~/.bashrc"

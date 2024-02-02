@@ -6,7 +6,7 @@
 
 .SH SYNOPSIS
 .B srap 
-[-a|--all] [-d|--dry-run] [-h|--help] [-n|--no-color] [-v|--verbose] 
+[-a|--all] [-d|--dry-run] [-f|--file <filename>] [-h|--help] [-n|--no-color] [-v|--verbose] 
 .I line
 
 .SH DESCRIPTION
@@ -20,6 +20,10 @@ Apply line to all POSIX-compatible shells
 .TP
 .B -d, --dry-run
 Don't write to any files
+
+.TP
+.B -f, --file <filename>
+Apply line to a specific file
 
 .TP
 .B -h, --help

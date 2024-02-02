@@ -4,12 +4,13 @@ the **s**hell **r**c **ap**pender
 
 ## Usage
 ```
-srap [-a/--all] [-d/--dry-run] [-h/--help] [-n/--no-color] [-v/--verbose] <line to append>
+srap [-a/--all] [-d/--dry-run] [-f/--file <filename>] [-h/--help] [-n/--no-color] [-v/--verbose] <line to append>
 ```
 Options:
 ```
 all      - change all POSIX-compliant shellrcs
 dry-run  - don't write to any files
+file     - append the line to this specific file 
 help     - show the help message
 no-color - don't use any ANSI escape sequences in the terminal
 verbose  - print verbose output 
