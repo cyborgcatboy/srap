@@ -74,28 +74,6 @@ fn parse_args(args: &mut Vec<String>) -> SrapConfig {
     config
 }
 
-/* find executables from the $path env var - for identifying shells (from https://stackoverflow.com/questions/37498864/finding-executable-in-path-with-rust) */
-fn find_it(exec_name: String) -> String {
-    let mut full_path_str : String = String::new();
-    match env::var_os("PATH").and_then(|paths| {
-        env::split_paths(&paths).filter_map(|dir| {
-            let full_path = dir.join(&exec_name);
-            if full_path.is_file() {
-                full_path_str = match full_path.clone().to_str() {
-                    Some(val) => val.to_string(),
-                    None => "".to_string()
-                };
-                Some(full_path_str.clone())
-            } else {
-                None
-            }
-        }).next()
-    }) {
-        Some(value) => value,
-        None => "".to_string()
-    }
-}
-
 fn print_help() {
     println!("srap - the Shell Rc APpender
 
@@ -225,19 +203,19 @@ fn main() {
         let config_file_path = {
             if !config.file.is_empty() {
                 config.file.as_str()
-            } else if shell.as_str() == find_it("zsh".to_string()) {
+            } else if shell.as_str().contains("zsh") {
                 "~/.zshrc"
-            } else if shell.as_str() == find_it("bash".to_string()) {
+            } else if shell.as_str() .contains("bash"){
                 "~/.bashrc"
-            } else if shell.as_str() == find_it("nsh".to_string()) {
+            } else if shell.as_str().contains("nsh") {
                 "~/.nshrc"
-            } else if shell.as_str() == find_it("ksh".to_string()) {
+            } else if shell.as_str().contains("ksh") {
                 "~/.kshrc"
-            } else if shell.as_str() == find_it("fish".to_string()) {
+            } else if shell.as_str().contains("fish") {
                 "~/.config/fish/config.fish"
-            } else if shell.as_str() == find_it("ion".to_string()) {
+            } else if shell.as_str().contains("ion") {
                 ".config/ion/initrc"
-            } else if shell.as_str() == find_it("tcsh".to_string()) {
+            } else if shell.as_str().contains("tcsh") {
                 "~/.cshrc"
             } else {
                 panic!("Unsupported shell!: {shell}")
